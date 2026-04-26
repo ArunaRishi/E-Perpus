@@ -9,7 +9,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export default async function DetailBukuScan({ 
   params 
 }: { 
-  params: { id: string } 
+  params: Promise<{ id: string }> 
 }) {
   
   // 2. TUNGGU PARAMS: Wajib di Next.js versi terbaru agar ID tidak 'undefined'
