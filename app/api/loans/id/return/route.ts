@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, context: any) {
   try {
-    const loanId = Number(params.id.trim());
+    const id = context.params?.id;
+
+    const loanId = Number(id?.toString().trim());
 
     if (isNaN(loanId)) {
       return NextResponse.json({ error: 'ID tidak valid.' }, { status: 400 });
