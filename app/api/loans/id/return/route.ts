@@ -1,20 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-// Define the context to match Next.js 15+ expectations
 type Context = {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 };
 
 export async function PATCH(
   req: NextRequest,
-  context: Context // params is inside context
+  context: Context
 ) {
   try {
-    // Await the params before using them
-    const { id } = await context.params;
-    
-    // Clean the ID (important if any trailing spaces leaked in)
+    const { id } = context.params; // ❌ TANPA await
+
     const loanId = Number(id.trim());
 
     if (isNaN(loanId)) {
