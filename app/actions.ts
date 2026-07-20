@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -49,7 +50,10 @@ export async function handleLogin(email: string, password: string) {
   }
 
   // 3. Jika sudah di-ACC, verifikasi login ke Supabase Auth
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  //    Pakai server client (cookie-aware) supaya sesi Auth benar-benar
+  //    tersimpan di cookie browser, bukan hilang begitu request selesai.
+  const supabaseServer = await createSupabaseServerClient();
+  const { data, error } = await supabaseServer.auth.signInWithPassword({ email, password });
   if (error || !data.user) {
     return { success: false, message: "Email atau Password salah!" };
   }
@@ -70,5 +74,6 @@ export async function handleLogout() {
   const cookieStore = await cookies();
   cookieStore.delete("session");
   cookieStore.delete("user_email");
-  await supabase.auth.signOut();
+  const supabaseServer = await createSupabaseServerClient();
+  await supabaseServer.auth.signOut();
 }
